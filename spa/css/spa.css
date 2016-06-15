@@ -1,0 +1,56 @@
+/* CSS Document */
+/**Begin reset*/
+*{
+  margin:0;
+  padding:0;
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -box-sizing:border-box;}
+ h1,h2,h3,h4,h5,h6,p{ margin-bottom:10px;}
+ol,ul,di  { list-style-position:inside;}
+/**End reset*/
+
+/**修改标准选择器*/
+body{
+  font:13px 'Trebuchet MS', Verdana, Helvettica, Arial, sans-serif;
+  color:#444;
+  background-color:#888;
+  }
+a{text-decoration:none;}
+  a:link, a:visited{ color:inherit;}
+  a:hover{ text-decoration:underline;}
+  
+strong{
+    font-weight:800;
+	color:#000;}
+/**End*/
+
+/**定义选择器的名字空间，通常使用根名字作为元素选择器*/
+#spa{
+ position:absolute;
+ top        :8px;
+ left        :8px;
+ bottom :8px;
+ right      :8px;
+ 
+ min-height:500px;
+ min-width:500px;
+ overflow:hidden;
+ background-color:#fff;
+ border-radius:0 8px 0 8px;
+}
+
+/**为其他所有模块添加通用选择器，以spa-x-作为前缀*/
+.spa-x-select {}
+.spa-x-clearfloat{
+  height:0     !important;
+  float:none  !important;
+  visibility:hidden  !important;
+  clear:both    !important;
+}
+
+
+
+
+
+
