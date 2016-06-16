@@ -4,6 +4,7 @@
 */
 
 spa.shell = (function(){
+	'use strict';
 	//-----BEGIN MODULE SCOPE VARIABLES--------
 	//把静态配置值放在configMap中
 	var configMap = {
@@ -12,7 +13,10 @@ spa.shell = (function(){
 			},
 			main_html:String()
 				+ '<div class="spa-shell-head"> '
-					+'<div class="spa-shell-head-logo"></div>'
+					+'<div class ="spa-shell-head-logo">'
+						+'<h1>SPA</h1>'
+						+'<p>Js end to end</p>'
+					+'</div>'
 					+'<div class="spa-shell-head-acct"></div>'
 					+'<div class="spa-shell-head-search"></div>'
 				+'</div>'
@@ -31,6 +35,7 @@ spa.shell = (function(){
 
 	copyAnchorMap, setJqueryMap,
 	changeAnchorPart, onHashchange,
+	onTapAcct, onLogin, onLogout,
 	setChatAnchor, initModule;
 	//-------END MODULE SCOPE VARIABLES-------
 
@@ -48,7 +53,9 @@ spa.shell = (function(){
 	setJqueryMap = function(){
 		var $container = stateMap.$container;
 		jqueryMap = {             //将聊天滑块的jQuery集合缓存到jqueryMap中
-			$container: $container
+			$container: $container,
+			$acct : $container.find('.spa-shell-head-acct'),
+			$nav : $container.find('.spa-shell-head-nav')
 		};
 	};
 
@@ -101,13 +108,6 @@ spa.shell = (function(){
 	//--------END DOM METHOD-------
 
 	//---------BEGIN EVENT HANDLERS-----------
-	/*onClickChat = function(event) {
-		toggleChat( stateMap.is_chat_retracted );
-		changeAnchorPart({
-			chat: ( stateMap.is_chat_retracted ? 'open' : 'closed')
-		});
-		return false;
-	};*/
 
 	//使用uriAnchor插件来将锚转换为映射，与之前的状态比较，以便确定要采取的动作
 	//如果提议的锚变化是无效的，则将锚重置为之前的值
@@ -117,7 +117,7 @@ spa.shell = (function(){
 			anchor_map_proposed,
 			is_ok = true,
 			_s_chat_previous, _s_chat_proposed,
-			s_char_proposed,
+			s_chat_proposed,
 			anchor_map_previous = copyAnchorMap();
 
 		//attemp to parse anchor
@@ -161,6 +161,31 @@ spa.shell = (function(){
 		}
 		return false;
 	};
+
+	//当点击账户元素时，如果是匿名的（为登入），提示输入用户名，然后调用login(),
+	//如果已登入，调用logout()
+	onTapAcct = function ( event ) {
+		var acct_text, user_name, user = spa.model.people.get_user();
+		if( user.get_is_anon() ){
+			user_name = prompt( 'Please sing-in' );
+			spa.model.people.login( user_name );
+			jqueryMap.$acct.text('... processing...');
+		}else{
+			spa.model.people.logout();
+		}
+		return false;
+	};
+
+	//更新右上角用户区，替换为用户名，
+	onLogin = function ( event, login_user ) {
+		jqueryMap.$acct.text( login_user.name );
+	};
+
+	//把用户区的文字恢复
+	onLogout = function ( event, login_user) {
+		jqueryMap.$acct.text( 'Please sign-in' );
+	};
+
 	//----------END EVENT HANDLERS--------------
 
 	//----------BEGIN CALLBACK-----------
@@ -198,6 +223,12 @@ spa.shell = (function(){
 		$(window)
 			.bind( 'hashchange', onHashchange)
 			.trigger( 'hashchange' );
+
+		$.gevent.subscribe( $container, 'spa-login', onLogin );
+		$.gevent.subscribe( $container, 'spa-logout', onLogout );
+		jqueryMap.$acct
+			.text( 'Please sign-in' )
+			.bind( 'utap', onTapAcct );
 	};
 
 	return {initModule : initModule };
